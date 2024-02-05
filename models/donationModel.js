@@ -1,6 +1,7 @@
 import mongoose from "mongoose";
 
 const donationSchema = new mongoose.Schema({
+  // being reviewed
   invoice: {
     type: String,
     required: true,
@@ -25,11 +26,13 @@ const donationSchema = new mongoose.Schema({
     required: [true, "Please insert your prayers."],
     maxlength: [500, "Prayer cannot be longer than 500 characters."],
   },
+  // being reviewed
   status: {
     type: String,
     enum: ["pending", "success", "expired", "failed"],
     required: true,
   },
+  // being reviewed
   snap_token: {
     type: String,
     required: true,
@@ -38,7 +41,7 @@ const donationSchema = new mongoose.Schema({
     type: Date,
     default: Date.now,
   },
-  created_at: {
+  updated_at: {
     type: Date,
     default: Date.now,
   },

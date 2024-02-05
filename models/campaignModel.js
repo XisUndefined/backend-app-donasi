@@ -27,6 +27,15 @@ const campaignSchema = new mongoose.Schema({
     required: [true, "Please insert expiration date for the campaign."],
     min: Date.now,
   },
+  description: {
+    type: String,
+    required: [true, "Please insert the description for the campaign."],
+    maxlength: [500, "Description cannot be longer than 500 characters."],
+  },
+  image: {
+    type: String,
+    required: true,
+  },
   user_id: {
     type: mongoose.Schema.Types.ObjectId,
     ref: "User",
