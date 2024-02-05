@@ -5,7 +5,7 @@ import mongoose from "mongoose";
 // console.log(process.env);
 
 mongoose
-  .connect(process.env.LOCAL_CONN_STR, { dbName: process.env.DB_NAME })
+  .connect(process.env.DB_LOCAL_CONN_STR, { dbName: process.env.DB_NAME })
   .then(() => console.log("Database Connection Successful."));
 
 const port = process.env.PORT || 3000;
