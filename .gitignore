@@ -1,5 +1,8 @@
 seeds.js
 tryConnection.js
+userSeeds.js
+campaignSeeds.js
+categorySeeds.js
 
 # Logs
 logs
