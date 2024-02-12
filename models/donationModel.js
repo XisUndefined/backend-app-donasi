@@ -1,4 +1,6 @@
 import mongoose from "mongoose";
+import User from "./userModel";
+import CustomError from "../utils/customErrorHandler";
 
 const donationSchema = new mongoose.Schema({
   // being reviewed
@@ -6,14 +8,14 @@ const donationSchema = new mongoose.Schema({
     type: String,
     required: true,
   },
-  campaign_id: {
+  campaignId: {
     type: mongoose.Schema.Types.ObjectId,
     ref: "Campaign",
     required: true,
   },
-  donatur_id: {
+  userId: {
     type: mongoose.Schema.Types.ObjectId,
-    ref: "Donatur",
+    ref: "User",
     required: true,
   },
   amount: {
@@ -33,19 +35,46 @@ const donationSchema = new mongoose.Schema({
     required: true,
   },
   // being reviewed
-  snap_token: {
+  snapToken: {
     type: String,
     required: true,
   },
-  created_at: {
-    type: Date,
-    default: Date.now,
-  },
-  updated_at: {
+  createdAt: {
     type: Date,
     default: Date.now,
   },
 });
+
+donationSchema.statics.createDonation = async function (donationData) {
+  const { invoice, slug, amount, pray, status, snapToken, userId } =
+    donationData;
+
+  const user = await User.findById(userId);
+  if (!user) {
+    return next(new CustomError("The requested user could not be found", 404));
+  }
+
+  const campaign = await User.findOne({ slug });
+  if (!campaign) {
+    return next(
+      new CustomError("The requested campaign could not be found", 404)
+    );
+  }
+  const campaignId = campaign._id;
+  const newDonation = new Donation({
+    invoice,
+    campaignId,
+    userId,
+    amount,
+    pray,
+    status,
+    snapToken,
+  });
+
+  await newDonation.save();
+
+  return newDonation;
+};
 
 const Donation = mongoose.model("Donation", donationSchema);
 export default Donation;

@@ -12,11 +12,15 @@ const categorySchema = new mongoose.Schema({
     unique: true,
     trim: true,
   },
-  created_at: {
+  image: {
+    type: String,
+    required: true,
+  },
+  createdAt: {
     type: Date,
     default: Date.now,
   },
-  updated_at: {
+  updatedAt: {
     type: Date,
     default: Date.now,
   },

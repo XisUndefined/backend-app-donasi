@@ -1,4 +1,7 @@
 import mongoose from "mongoose";
+import User from "./userModel.js";
+import Category from "./categoryModel.js";
+import CustomError from "../utils/customErrorHandler.js";
 
 const campaignSchema = new mongoose.Schema({
   title: {
@@ -12,17 +15,17 @@ const campaignSchema = new mongoose.Schema({
     unique: true,
     trim: true,
   },
-  category_id: {
+  categoryId: {
     type: mongoose.Schema.Types.ObjectId,
     ref: "Category",
     required: [true, "Please insert the category."],
   },
-  target_donation: {
+  targetDonation: {
     type: Number,
     min: [0, "Target donation can't be negative."],
     required: [true, "Target donation is required."],
   },
-  max_date: {
+  maxDate: {
     type: Date,
     required: [true, "Please insert expiration date for the campaign."],
     min: Date.now,
@@ -36,25 +39,67 @@ const campaignSchema = new mongoose.Schema({
     type: String,
     required: true,
   },
-  user_id: {
+  userId: {
     type: mongoose.Schema.Types.ObjectId,
     ref: "User",
     required: true,
   },
-  created_at: {
+  createdAt: {
     type: Date,
     default: Date.now,
   },
-  updated_at: {
+  updatedAt: {
     type: Date,
     default: Date.now,
   },
 });
 
-campaignModel.pre("save", function (next) {
+campaignSchema.pre("save", async function (next) {
   this.slug = slugify(this.title, { lower: true });
   next();
 });
+
+campaignSchema.statics.createCampaign = async function (campaignData) {
+  const {
+    title,
+    targetDonation,
+    maxDate,
+    description,
+    image,
+    categoryName,
+    userId,
+  } = campaignData;
+
+  // Find the user ID
+  const user = await User.findById(userId);
+  if (!user) {
+    return next(new CustomError("The requested user could not be found", 404));
+  }
+
+  // Find the category ID
+  const category = await Category.findOne({ name: categoryName });
+  if (!category) {
+    const error = new CustomError("Category not found.", 404);
+    return next(error);
+  }
+  const categoryId = category._id;
+
+  // Create the campaign
+  const newCampaign = new Campaign({
+    title,
+    targetDonation,
+    maxDate,
+    description,
+    image,
+    categoryId,
+    userId,
+  });
+
+  // Save the campaign
+  await newCampaign.save();
+
+  return newCampaign;
+};
 
 const Campaign = mongoose.model("Campaign", campaignSchema);
 export default Campaign;
